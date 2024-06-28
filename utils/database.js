@@ -9,8 +9,14 @@ export const connectToDB = async () => {
         console.log('MongoDB is already connected');
         return;
     }
+    const uri = process.env.MONGODB_URI;
+
+    if (!uri) {
+        throw new Error("MONGODB_URI environment variable is not defined");
+      }
+
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
+        await mongoose.connect(uri, {
             dbName:"share_prompt",
             useNewUrlParser: true,
             useUnifiedTopology: true,

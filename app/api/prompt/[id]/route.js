@@ -17,26 +17,31 @@ export const GET = async (request, {params}) => {
 } 
 
 //PATCH (update)
-export const PATCH = async (request, {params}) => {
-    const {prompt ,tag} = await request.json();
-
+export const PATCH = async (req, { params }) => {
     try {
-        await connectToDB();
-
-        const existingPrompt = await Prompt.findById(params.id);
-        if(!existingPrompt) return new Response("Prompt not found", { status: 404 })
-            
-
-            existingPrompt.prompt = prompt;
-            existingPrompt.tag = tag;
-
-            await existingPrompt.save();
-
-            return new Response(JSON.stringify(existingPrompt), { status: 200 })
-        } catch (error) {
-            return new Response("Failed to update the prompt", { status: 500 })
+      await connectToDB();
+      const { id } = params;
+      const { prompt, tag } = await req.json();
+  
+      if (!id) return new Response("Prompt ID is required", { status: 400 });
+  
+      const existingPrompt = await Prompt.findById(id);
+  
+      if (!existingPrompt) {
+        return new Response("Prompt not found", { status: 404 });
+      }
+  
+      existingPrompt.prompt = prompt;
+      existingPrompt.tag = tag;
+  
+      await existingPrompt.save();
+  
+      return new Response(JSON.stringify(existingPrompt), { status: 200 });
+    } catch (error) {
+      console.error(error);
+      return new Response("Failed to update prompt", { status: 500 });
     }
-}
+  };
 
 //DELETE
 export const DELETE = async (request,{params}) => {
